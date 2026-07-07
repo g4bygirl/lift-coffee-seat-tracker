@@ -60,7 +60,7 @@ function seedLogs(): OccupancyLog[] {
     timestamp: `${today} ${h}`,
     hour: h,
     occupied: counts[i],
-    customers: counts[i] + Math.floor(Math.random() * 3),
+    customers: counts[i] + (i % 3),
   }));
 }
 
