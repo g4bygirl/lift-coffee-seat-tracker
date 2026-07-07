@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 import { SeatMap } from "@/components/SeatMap";
@@ -6,7 +6,7 @@ import { useCafe, type Seat, type SeatStatus, formatHour } from "@/lib/cafe-stor
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Circle, X, Clock, Wrench } from "lucide-react";
+import { Circle, X, Clock, Wrench, Database, ShieldCheck, ArrowRight } from "lucide-react";
 
 export const Route = createFileRoute("/employee")({
   component: Employee,
