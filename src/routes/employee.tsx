@@ -49,6 +49,59 @@ function Employee() {
         <p className="text-muted-foreground">Manage seats and log hourly headcounts.</p>
       </div>
 
+      <div className="grid gap-4 md:grid-cols-2">
+        <div className="group rounded-3xl border border-border bg-card p-6 transition-shadow hover:shadow-md">
+          <div className="flex items-start gap-4">
+            <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-latte/50 text-espresso">
+              <Database className="h-5 w-5" />
+            </div>
+            <div className="flex-1">
+              <div className="font-display text-lg font-semibold text-espresso">Raw Data Feed</div>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Timestamped log of every staff-updated headcount.
+              </p>
+              <div className="mt-3 text-xs text-muted-foreground">
+                <span className="font-medium text-espresso">{state.logs.length}</span> entries logged
+                {state.logs.length > 0 && (
+                  <> · latest {state.logs[state.logs.length - 1].hour}: {state.logs[state.logs.length - 1].customers}</>
+                )}
+              </div>
+            </div>
+          </div>
+          <Button asChild variant="outline" className="mt-4 w-full">
+            <Link to="/employee/raw-data">
+              View feed <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
+          </Button>
+        </div>
+
+        <div className="group rounded-3xl border border-border bg-card p-6 transition-shadow hover:shadow-md">
+          <div className="flex items-start gap-4">
+            <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-latte/50 text-espresso">
+              <ShieldCheck className="h-5 w-5" />
+            </div>
+            <div className="flex-1">
+              <div className="font-display text-lg font-semibold text-espresso">Verify &amp; Cleanse</div>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Two-step confirmation before an entry hits the data feed.
+              </p>
+              <div className="mt-3 flex items-center gap-1.5 text-[11px] uppercase tracking-widest text-muted-foreground">
+                <span>Enter</span>
+                <ArrowRight className="h-3 w-3" />
+                <span>Confirm</span>
+                <ArrowRight className="h-3 w-3" />
+                <span>Submitted</span>
+              </div>
+            </div>
+          </div>
+          <Button asChild className="mt-4 w-full">
+            <Link to="/employee/verify">
+              Start verification <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
+          </Button>
+        </div>
+      </div>
+
       <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
         <SeatMap onSeatClick={setSelected} />
 
