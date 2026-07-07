@@ -9,38 +9,166 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SentimentRouteImport } from './routes/sentiment'
+import { Route as RealTimeRouteImport } from './routes/real-time'
+import { Route as ForecastRouteImport } from './routes/forecast'
+import { Route as FindSeatingRouteImport } from './routes/find-seating'
+import { Route as EmployeeRouteImport } from './routes/employee'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as EmployeeVerifyRouteImport } from './routes/employee.verify'
+import { Route as EmployeeRawDataRouteImport } from './routes/employee.raw-data'
 
+const SentimentRoute = SentimentRouteImport.update({
+  id: '/sentiment',
+  path: '/sentiment',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RealTimeRoute = RealTimeRouteImport.update({
+  id: '/real-time',
+  path: '/real-time',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForecastRoute = ForecastRouteImport.update({
+  id: '/forecast',
+  path: '/forecast',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FindSeatingRoute = FindSeatingRouteImport.update({
+  id: '/find-seating',
+  path: '/find-seating',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EmployeeRoute = EmployeeRouteImport.update({
+  id: '/employee',
+  path: '/employee',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EmployeeVerifyRoute = EmployeeVerifyRouteImport.update({
+  id: '/verify',
+  path: '/verify',
+  getParentRoute: () => EmployeeRoute,
+} as any)
+const EmployeeRawDataRoute = EmployeeRawDataRouteImport.update({
+  id: '/raw-data',
+  path: '/raw-data',
+  getParentRoute: () => EmployeeRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/employee': typeof EmployeeRouteWithChildren
+  '/find-seating': typeof FindSeatingRoute
+  '/forecast': typeof ForecastRoute
+  '/real-time': typeof RealTimeRoute
+  '/sentiment': typeof SentimentRoute
+  '/employee/raw-data': typeof EmployeeRawDataRoute
+  '/employee/verify': typeof EmployeeVerifyRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/employee': typeof EmployeeRouteWithChildren
+  '/find-seating': typeof FindSeatingRoute
+  '/forecast': typeof ForecastRoute
+  '/real-time': typeof RealTimeRoute
+  '/sentiment': typeof SentimentRoute
+  '/employee/raw-data': typeof EmployeeRawDataRoute
+  '/employee/verify': typeof EmployeeVerifyRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/employee': typeof EmployeeRouteWithChildren
+  '/find-seating': typeof FindSeatingRoute
+  '/forecast': typeof ForecastRoute
+  '/real-time': typeof RealTimeRoute
+  '/sentiment': typeof SentimentRoute
+  '/employee/raw-data': typeof EmployeeRawDataRoute
+  '/employee/verify': typeof EmployeeVerifyRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/employee'
+    | '/find-seating'
+    | '/forecast'
+    | '/real-time'
+    | '/sentiment'
+    | '/employee/raw-data'
+    | '/employee/verify'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/employee'
+    | '/find-seating'
+    | '/forecast'
+    | '/real-time'
+    | '/sentiment'
+    | '/employee/raw-data'
+    | '/employee/verify'
+  id:
+    | '__root__'
+    | '/'
+    | '/employee'
+    | '/find-seating'
+    | '/forecast'
+    | '/real-time'
+    | '/sentiment'
+    | '/employee/raw-data'
+    | '/employee/verify'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  EmployeeRoute: typeof EmployeeRouteWithChildren
+  FindSeatingRoute: typeof FindSeatingRoute
+  ForecastRoute: typeof ForecastRoute
+  RealTimeRoute: typeof RealTimeRoute
+  SentimentRoute: typeof SentimentRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sentiment': {
+      id: '/sentiment'
+      path: '/sentiment'
+      fullPath: '/sentiment'
+      preLoaderRoute: typeof SentimentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/real-time': {
+      id: '/real-time'
+      path: '/real-time'
+      fullPath: '/real-time'
+      preLoaderRoute: typeof RealTimeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forecast': {
+      id: '/forecast'
+      path: '/forecast'
+      fullPath: '/forecast'
+      preLoaderRoute: typeof ForecastRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/find-seating': {
+      id: '/find-seating'
+      path: '/find-seating'
+      fullPath: '/find-seating'
+      preLoaderRoute: typeof FindSeatingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/employee': {
+      id: '/employee'
+      path: '/employee'
+      fullPath: '/employee'
+      preLoaderRoute: typeof EmployeeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +176,44 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/employee/verify': {
+      id: '/employee/verify'
+      path: '/verify'
+      fullPath: '/employee/verify'
+      preLoaderRoute: typeof EmployeeVerifyRouteImport
+      parentRoute: typeof EmployeeRoute
+    }
+    '/employee/raw-data': {
+      id: '/employee/raw-data'
+      path: '/raw-data'
+      fullPath: '/employee/raw-data'
+      preLoaderRoute: typeof EmployeeRawDataRouteImport
+      parentRoute: typeof EmployeeRoute
+    }
   }
 }
 
+interface EmployeeRouteChildren {
+  EmployeeRawDataRoute: typeof EmployeeRawDataRoute
+  EmployeeVerifyRoute: typeof EmployeeVerifyRoute
+}
+
+const EmployeeRouteChildren: EmployeeRouteChildren = {
+  EmployeeRawDataRoute: EmployeeRawDataRoute,
+  EmployeeVerifyRoute: EmployeeVerifyRoute,
+}
+
+const EmployeeRouteWithChildren = EmployeeRoute._addFileChildren(
+  EmployeeRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  EmployeeRoute: EmployeeRouteWithChildren,
+  FindSeatingRoute: FindSeatingRoute,
+  ForecastRoute: ForecastRoute,
+  RealTimeRoute: RealTimeRoute,
+  SentimentRoute: SentimentRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
