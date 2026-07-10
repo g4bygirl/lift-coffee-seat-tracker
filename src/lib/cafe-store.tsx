@@ -81,6 +81,7 @@ interface CafeState {
   seats: Seat[];
   logs: OccupancyLog[];
   feedback: Feedback[];
+  capacity: number;
 }
 
 type Action =
@@ -90,7 +91,9 @@ type Action =
   | { type: "SET_STATUS"; id: string; status: SeatStatus }
   | { type: "EXPIRE_HOLDS" }
   | { type: "ADD_LOG"; log: OccupancyLog }
-  | { type: "ADD_FEEDBACK"; fb: Feedback };
+  | { type: "ADD_FEEDBACK"; fb: Feedback }
+  | { type: "SET_CAPACITY"; capacity: number };
+
 
 function reducer(state: CafeState, a: Action): CafeState {
   switch (a.type) {
@@ -146,6 +149,8 @@ function reducer(state: CafeState, a: Action): CafeState {
       return { ...state, logs: [...state.logs, a.log] };
     case "ADD_FEEDBACK":
       return { ...state, feedback: [a.fb, ...state.feedback] };
+    case "SET_CAPACITY":
+      return { ...state, capacity: Math.max(1, Math.min(40, a.capacity)) };
     default:
       return state;
   }
@@ -172,6 +177,7 @@ export function CafeProvider({ children }: { children: ReactNode }) {
     seats: seedSeats(),
     logs: seedLogs(),
     feedback: SEED_FEEDBACK,
+    capacity: 20,
   }));
   const [view, setView] = useState<ViewMode>("student");
   const [mockHour, setMockHour] = useState(9); // demo default 9 AM
