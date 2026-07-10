@@ -81,6 +81,7 @@ interface CafeState {
   seats: Seat[];
   logs: OccupancyLog[];
   feedback: Feedback[];
+  capacity: number;
 }
 
 type Action =
@@ -90,7 +91,9 @@ type Action =
   | { type: "SET_STATUS"; id: string; status: SeatStatus }
   | { type: "EXPIRE_HOLDS" }
   | { type: "ADD_LOG"; log: OccupancyLog }
-  | { type: "ADD_FEEDBACK"; fb: Feedback };
+  | { type: "ADD_FEEDBACK"; fb: Feedback }
+  | { type: "SET_CAPACITY"; capacity: number };
+
 
 function reducer(state: CafeState, a: Action): CafeState {
   switch (a.type) {
