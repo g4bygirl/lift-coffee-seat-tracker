@@ -1,12 +1,11 @@
-import { useCafe, type Seat } from "@/lib/cafe-store";
+import { useCafe, type Seat, type FeatureTag } from "@/lib/cafe-store";
 import { cn } from "@/lib/utils";
 import { X, Wifi, Zap, Users, Wrench } from "lucide-react";
 import { useEffect, useState } from "react";
 
 interface Props {
   onSeatClick?: (seat: Seat) => void;
-  highlightFeature?: string | null;
-  interactiveWhenClosed?: boolean;
+  highlightFeatures?: FeatureTag[];
 }
 
 function seatColor(s: Seat, highlight?: boolean) {
@@ -31,7 +30,7 @@ function useCountdown(startedAt?: number) {
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
-function Seat({ seat, onClick, highlight }: { seat: Seat; onClick?: () => void; highlight?: boolean }) {
+function SeatButton({ seat, onClick, highlight }: { seat: Seat; onClick?: () => void; highlight?: boolean }) {
   const countdown = useCountdown(seat.status === "Reserved" ? seat.reservationTimestamp : undefined);
   return (
     <button
@@ -52,16 +51,18 @@ function Seat({ seat, onClick, highlight }: { seat: Seat; onClick?: () => void; 
   );
 }
 
-export function SeatMap({ onSeatClick, highlightFeature }: Props) {
+export function SeatMap({ onSeatClick, highlightFeatures }: Props) {
   const { state } = useCafe();
   const tables = [1, 2, 3, 4, 5];
+  const filters = highlightFeatures ?? [];
+  const hasFilters = filters.length > 0;
   return (
     <div className="rounded-3xl border border-border bg-card/60 p-6">
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {tables.map((tn) => {
           const seats = state.seats.filter((s) => s.tableNumber === tn);
           const features = seats[0]?.features ?? [];
-          const matches = highlightFeature ? features.includes(highlightFeature as any) : false;
+          const matches = hasFilters ? filters.every((f) => features.includes(f)) : false;
           const allOccupied = seats.every((s) => s.status === "Occupied" || s.status === "Out of Order");
           return (
             <div
@@ -75,46 +76,49 @@ export function SeatMap({ onSeatClick, highlightFeature }: Props) {
                 <div>
                   <div className="font-display text-lg font-semibold text-espresso">Table {tn}</div>
                   <div className="flex flex-wrap gap-1.5 pt-1">
-                    {features.map((f) => (
-                      <span
-                        key={f}
-                        className={cn(
-                          "inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px]",
-                          highlightFeature === f
-                            ? "border-sage bg-sage text-espresso"
-                            : "border-border bg-background text-muted-foreground",
-                        )}
-                      >
-                        {f === "Reliable Wi-Fi" && <Wifi className="h-3 w-3" />}
-                        {f === "Nearby Outlets" && <Zap className="h-3 w-3" />}
-                        {f === "Large Table Size" && <Users className="h-3 w-3" />}
-                        {f}
-                      </span>
-                    ))}
+                    {features.map((f) => {
+                      const on = filters.includes(f);
+                      return (
+                        <span
+                          key={f}
+                          className={cn(
+                            "inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px]",
+                            on
+                              ? "border-sage bg-sage text-espresso"
+                              : "border-border bg-background text-muted-foreground",
+                          )}
+                        >
+                          {f === "Reliable Wi-Fi" && <Wifi className="h-3 w-3" />}
+                          {f === "Nearby Outlets" && <Zap className="h-3 w-3" />}
+                          {f === "Large Table Size" && <Users className="h-3 w-3" />}
+                          {f}
+                        </span>
+                      );
+                    })}
                   </div>
                 </div>
               </div>
               <div className="relative mx-auto mt-3 grid aspect-square max-w-[220px] grid-cols-3 grid-rows-3 place-items-center">
                 <div className="col-start-2 row-start-2 h-24 w-24 rounded-full border-2 border-copper/60 bg-latte/40" />
                 <div className="col-start-2 row-start-1">
-                  <Seat seat={seats[0]} onClick={onSeatClick ? () => onSeatClick(seats[0]) : undefined} highlight={matches} />
+                  <SeatButton seat={seats[0]} onClick={onSeatClick ? () => onSeatClick(seats[0]) : undefined} highlight={matches} />
                 </div>
                 <div className="col-start-3 row-start-2">
-                  <Seat seat={seats[1]} onClick={onSeatClick ? () => onSeatClick(seats[1]) : undefined} highlight={matches} />
+                  <SeatButton seat={seats[1]} onClick={onSeatClick ? () => onSeatClick(seats[1]) : undefined} highlight={matches} />
                 </div>
                 <div className="col-start-2 row-start-3">
-                  <Seat seat={seats[2]} onClick={onSeatClick ? () => onSeatClick(seats[2]) : undefined} highlight={matches} />
+                  <SeatButton seat={seats[2]} onClick={onSeatClick ? () => onSeatClick(seats[2]) : undefined} highlight={matches} />
                 </div>
                 <div className="col-start-1 row-start-2">
-                  <Seat seat={seats[3]} onClick={onSeatClick ? () => onSeatClick(seats[3]) : undefined} highlight={matches} />
+                  <SeatButton seat={seats[3]} onClick={onSeatClick ? () => onSeatClick(seats[3]) : undefined} highlight={matches} />
                 </div>
               </div>
-              {highlightFeature && !matches && (
+              {hasFilters && !matches && (
                 <div className="mt-3 rounded-lg bg-destructive/10 px-3 py-2 text-center text-xs font-medium text-destructive">
-                  Unavailable — does not match "{highlightFeature}"
+                  Doesn't match all selected filters
                 </div>
               )}
-              {highlightFeature && matches && allOccupied && (
+              {hasFilters && matches && allOccupied && (
                 <div className="mt-3 rounded-lg bg-destructive/10 px-3 py-2 text-center text-xs font-medium text-destructive">
                   Unavailable — all seats occupied
                 </div>
