@@ -177,6 +177,7 @@ export function CafeProvider({ children }: { children: ReactNode }) {
     seats: seedSeats(),
     logs: seedLogs(),
     feedback: SEED_FEEDBACK,
+    capacity: 20,
   }));
   const [view, setView] = useState<ViewMode>("student");
   const [mockHour, setMockHour] = useState(9); // demo default 9 AM
