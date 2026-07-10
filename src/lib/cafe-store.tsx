@@ -149,6 +149,8 @@ function reducer(state: CafeState, a: Action): CafeState {
       return { ...state, logs: [...state.logs, a.log] };
     case "ADD_FEEDBACK":
       return { ...state, feedback: [a.fb, ...state.feedback] };
+    case "SET_CAPACITY":
+      return { ...state, capacity: Math.max(1, Math.min(40, a.capacity)) };
     default:
       return state;
   }
