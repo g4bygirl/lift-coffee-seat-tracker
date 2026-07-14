@@ -115,9 +115,21 @@ export function CustomerPortal() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="font-display text-3xl font-semibold text-espresso sm:text-4xl">Customer Portal</h1>
-        <p className="text-muted-foreground">Live map of every seat — filter by what your session needs, tap a seat to reserve.</p>
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="font-display text-3xl font-semibold text-espresso sm:text-4xl">Customer Portal</h1>
+          <p className="text-muted-foreground">Live map of every seat — filter by what your session needs, tap a seat to reserve.</p>
+        </div>
+        <span
+          className={cn(
+            "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium",
+            holdCount >= MAX_RESERVATIONS
+              ? "border-destructive/50 bg-destructive/10 text-destructive"
+              : "border-border bg-background text-espresso",
+          )}
+        >
+          Active holds: {holdCount} / {MAX_RESERVATIONS}
+        </span>
       </div>
 
       <StatRow />
