@@ -222,7 +222,7 @@ export function CustomerPortal() {
                     Held by another customer
                   </Button>
                 )}
-                {selected.status === "Reserved" && (
+                {selected.status === "Reserved" && myHolds[selected.id] && (
                   <>
                     <Button variant="outline" onClick={cancel}>
                       Cancel reservation
