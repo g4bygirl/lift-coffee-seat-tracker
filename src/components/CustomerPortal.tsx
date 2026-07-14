@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { SeatMap } from "@/components/SeatMap";
 import { StatRow } from "@/components/StatRow";
 import { ForecastPanel } from "@/components/ForecastPanel";
@@ -23,10 +23,48 @@ const FILTERS: { label: FeatureTag; icon: any }[] = [
   { label: "Large Table Size", icon: Users },
 ];
 
+const MAX_RESERVATIONS = 4;
+
 export function CustomerPortal() {
-  const { isOpen, dispatch } = useCafe();
+  const { state, isOpen, dispatch } = useCafe();
   const [active, setActive] = useState<FeatureTag[]>([]);
   const [selected, setSelected] = useState<Seat | null>(null);
+  // Seat IDs this customer currently holds, with the time they held them.
+  const [myHolds, setMyHolds] = useState<Record<string, number>>({});
+  const notifiedRef = useRef<Set<string>>(new Set());
+
+  const holdCount = Object.keys(myHolds).length;
+
+  // Watch for staff-initiated changes to seats this customer holds.
+  useEffect(() => {
+    const now = Date.now();
+    const stillHeld: Record<string, number> = {};
+    for (const [id, heldAt] of Object.entries(myHolds)) {
+      const seat = state.seats.find((s) => s.id === id);
+      if (!seat) continue;
+      if (seat.status === "Reserved") {
+        stillHeld[id] = heldAt;
+        continue;
+      }
+      if (seat.status === "Occupied" && seat.claimed) {
+        // Customer claimed the seat — silently drop from holds.
+        continue;
+      }
+      if (notifiedRef.current.has(id)) continue;
+      notifiedRef.current.add(id);
+      const elapsed = now - heldAt;
+      if (elapsed >= 10 * 60 * 1000 - 1500 && seat.status === "Available") {
+        toast.info(`Your 10-minute hold on ${id} expired. Pick another seat when you're ready.`);
+      } else if (seat.status === "Out of Order") {
+        toast.error(`Staff marked ${id} out of order — your reservation was released. Please choose another seat.`);
+      } else {
+        toast.error(`Staff cancelled your reservation for ${id}. Please choose another seat.`);
+      }
+    }
+    if (Object.keys(stillHeld).length !== Object.keys(myHolds).length) {
+      setMyHolds(stillHeld);
+    }
+  }, [state.seats, myHolds]);
 
   const toggle = (f: FeatureTag) =>
     setActive((prev) => (prev.includes(f) ? prev.filter((x) => x !== f) : [...prev, f]));
@@ -42,19 +80,35 @@ export function CustomerPortal() {
 
   const reserve = () => {
     if (!selected) return;
+    if (holdCount >= MAX_RESERVATIONS) {
+      toast.error(`You can only hold ${MAX_RESERVATIONS} seats at a time. Claim or cancel one first.`);
+      setSelected(null);
+      return;
+    }
     dispatch({ type: "HOLD", id: selected.id });
+    setMyHolds((prev) => ({ ...prev, [selected.id]: Date.now() }));
+    notifiedRef.current.delete(selected.id);
     toast.success(`${selected.id} reserved for 10 minutes.`);
     setSelected(null);
   };
   const claim = () => {
     if (!selected) return;
     dispatch({ type: "CLAIM", id: selected.id });
+    setMyHolds((prev) => {
+      const { [selected.id]: _, ...rest } = prev;
+      return rest;
+    });
     toast.success(`Welcome! ${selected.id} is now yours.`);
     setSelected(null);
   };
   const cancel = () => {
     if (!selected) return;
     dispatch({ type: "CANCEL", id: selected.id });
+    setMyHolds((prev) => {
+      const { [selected.id]: _, ...rest } = prev;
+      return rest;
+    });
+    notifiedRef.current.add(selected.id);
     toast.success(`${selected.id} reservation cancelled.`);
     setSelected(null);
   };
