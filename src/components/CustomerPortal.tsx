@@ -213,7 +213,14 @@ export function CustomerPortal() {
               </DialogHeader>
               <DialogFooter className="gap-2 sm:gap-2">
                 {selected.status === "Available" && (
-                  <Button onClick={reserve}>Reserve for 10 min</Button>
+                  <Button onClick={reserve} disabled={holdCount >= MAX_RESERVATIONS}>
+                    {holdCount >= MAX_RESERVATIONS ? `Limit ${MAX_RESERVATIONS} reached` : "Reserve for 10 min"}
+                  </Button>
+                )}
+                {selected.status === "Reserved" && !myHolds[selected.id] && (
+                  <Button variant="outline" onClick={() => setSelected(null)}>
+                    Held by another customer
+                  </Button>
                 )}
                 {selected.status === "Reserved" && (
                   <>
