@@ -47,15 +47,16 @@ export function SentimentStrip() {
   const submit = () => {
     const trimmed = text.trim();
     if (!trimmed) return;
+    const { sentiment, score } = analyzeSentiment(trimmed);
     const fb: Feedback = {
       id: `f-${Date.now()}`,
       date: new Date().toISOString().slice(0, 10),
-      sentiment: classify(trimmed),
+      sentiment,
       text: trimmed,
     };
     dispatch({ type: "ADD_FEEDBACK", fb });
     setText("");
-    toast.success(`Feedback added · classified as ${fb.sentiment}`);
+    toast.success(`Feedback added · ${sentiment} (score ${score > 0 ? "+" : ""}${score})`);
   };
 
   return (
