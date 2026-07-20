@@ -5,16 +5,27 @@ import { Textarea } from "@/components/ui/textarea";
 import { Sparkles, ThumbsUp, ThumbsDown, Minus } from "lucide-react";
 import { toast } from "sonner";
 
-const NEG_WORDS = ["crowd", "noisy", "slow", "cold", "bad", "hate", "dirty", "wait", "expensive", "no tables", "loud", "rude"];
-const POS_WORDS = ["love", "great", "amazing", "cozy", "friendly", "fast", "clean", "quiet", "perfect", "best", "warm"];
+const SENTIMENT_LEXICON: Record<string, number> = {
+  // Positive (+1 to +3)
+  great: 2, amazing: 3, good: 1, best: 3, love: 2, delicious: 2, excellent: 3,
+  friendly: 1, cozy: 2, quiet: 1, perfect: 3, warm: 1, clean: 1, fast: 1,
+  // Negative (-1 to -3)
+  bad: -1, terrible: -3, worst: -3, horrible: -3, hate: -2, slow: -1,
+  awful: -3, dirty: -2, noisy: -1, loud: -1, rude: -2, cold: -1, crowded: -1,
+  expensive: -1,
+};
 
-function classify(text: string): Feedback["sentiment"] {
-  const t = text.toLowerCase();
-  const neg = NEG_WORDS.some((w) => t.includes(w));
-  const pos = POS_WORDS.some((w) => t.includes(w));
-  if (neg && !pos) return "Negative";
-  if (pos && !neg) return "Positive";
-  return "Neutral";
+function analyzeSentiment(text: string): { score: number; sentiment: Feedback["sentiment"] } {
+  const clean = text.toLowerCase().replace(/[^\w\s]/gi, "");
+  const words = clean.split(/\s+/).filter(Boolean);
+  let score = 0;
+  for (const w of words) {
+    if (Object.prototype.hasOwnProperty.call(SENTIMENT_LEXICON, w)) {
+      score += SENTIMENT_LEXICON[w];
+    }
+  }
+  const sentiment: Feedback["sentiment"] = score > 0 ? "Positive" : score < 0 ? "Negative" : "Neutral";
+  return { score, sentiment };
 }
 
 function icon(s: Feedback["sentiment"]) {
