@@ -6,24 +6,47 @@ import { Sparkles, ThumbsUp, ThumbsDown, Minus } from "lucide-react";
 import { toast } from "sonner";
 
 const SENTIMENT_LEXICON: Record<string, number> = {
-  // Positive (+1 to +3)
+  // Standard Positive (+1 to +3)
   great: 2, amazing: 3, good: 1, best: 3, love: 2, delicious: 2, excellent: 3,
-  friendly: 1, cozy: 2, quiet: 1, perfect: 3, warm: 1, clean: 1, fast: 1,
-  // Negative (-1 to -3)
+  friendly: 1, awesome: 2, perfect: 3, wonderful: 2, clean: 1, fast: 1, cozy: 2,
+  // Positive Slang & Gen Z/Internet Terms (+1 to +3)
+  slays: 2, fire: 2, bussing: 2, bussin: 2, goat: 3, elite: 3, hit: 2,
+  ate: 2, valid: 1, w: 2, chefskiss: 3, vibe: 1, vibes: 1, gas: 2, bomb: 2,
+  // Standard Negative (-1 to -3)
   bad: -1, terrible: -3, worst: -3, horrible: -3, hate: -2, slow: -1,
-  awful: -3, dirty: -2, noisy: -1, loud: -1, rude: -2, cold: -1, crowded: -1,
-  expensive: -1,
+  awful: -3, dirty: -2, gross: -2, expensive: -1, rude: -2, mid: -1, trash: -3,
+  // Negative Slang & Gen Z/Internet Terms (-1 to -3)
+  l: -2, flop: -2, cooked: -2, cringe: -2, "🗑️": -3, sketchy: -2,
+  sucks: -2, ass: -2, cap: -1, sus: -1, ick: -2, unvalid: -2,
 };
 
+const NEGATION_WORDS = new Set(["not", "no", "never", "isnt", "wasnt", "aint", "dont", "cant"]);
+
 function analyzeSentiment(text: string): { score: number; sentiment: Feedback["sentiment"] } {
-  const clean = text.toLowerCase().replace(/[^\w\s]/gi, "");
+  // Keep words, spaces, and emoji so 🗑️ can be matched.
+  const clean = text.toLowerCase().replace(/[^\w\s\u{1F300}-\u{1FAFF}]/giu, "");
   const words = clean.split(/\s+/).filter(Boolean);
   let score = 0;
-  for (const w of words) {
-    if (Object.prototype.hasOwnProperty.call(SENTIMENT_LEXICON, w)) {
-      score += SENTIMENT_LEXICON[w];
+  let isNegated = false;
+
+  for (const word of words) {
+    if (NEGATION_WORDS.has(word)) {
+      isNegated = true;
+      continue;
+    }
+
+    if (Object.prototype.hasOwnProperty.call(SENTIMENT_LEXICON, word)) {
+      let wordScore = SENTIMENT_LEXICON[word];
+      if (isNegated) {
+        wordScore = -wordScore;
+        isNegated = false;
+      }
+      score += wordScore;
+    } else {
+      isNegated = false;
     }
   }
+
   const sentiment: Feedback["sentiment"] = score > 0 ? "Positive" : score < 0 ? "Negative" : "Neutral";
   return { score, sentiment };
 }
