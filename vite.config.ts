@@ -3,7 +3,7 @@ import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 export default defineConfig({
   vite: {
     // Sets the base path for assets to point to your GitHub repo
-    base: "/life-seat-hub/",
+    base: "/llift-coffee-seat-tracker/",
   },
   
   // Set Nitro output target to static SSG for GitHub Pages compatibility
