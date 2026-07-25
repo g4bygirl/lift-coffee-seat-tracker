@@ -6,9 +6,12 @@ export default defineConfig({
   },
   nitro: {
     preset: "static",
+    prerender: {
+      routes: ["/lift-coffee-seat-tracker/"],
+      crawlLinks: false,
+    },
   },
   tanstackStart: {
     server: { entry: "server" },
   },
 });
-// repo
